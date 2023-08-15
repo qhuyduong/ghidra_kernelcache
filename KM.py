@@ -13,7 +13,7 @@ def main():
     Obj = iom.getObjects()
     #del Obj['OSKext']
 
-    kc = Kext(Obj,shared_p="macOS_12.1")
+    kc = Kext(Obj,shared_p="macOS_12")
     kc.depac()
     kc.process_kernel_kext()
 

@@ -12,7 +12,7 @@ def main():
     iom = ParseIOMeta(ff)
     Obj = iom.getObjects()
 
-    kc = Kext(Obj,shared_p="macOS_12.1")
+    kc = Kext(Obj,shared_p="macOS_12")
 
     kc.process_kernel_kext()
 
