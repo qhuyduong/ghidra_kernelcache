@@ -1,3 +1,4 @@
+import re
 from helpers import *
 from __main__ import *
 from methods import *
@@ -565,6 +566,12 @@ class kernelCacheClass(object):
     def prepareSignature(self,method):
         return self.parseCSignature(method)
 
+    def removeClassPrefix(self, signature):
+        firstPart = signature.split("::", 1)[0]
+        secondPart = signature.split("::", 1)[1]
+        pattern = r'(\w+)::'
+        return firstPart + "::" + re.sub(pattern, '', secondPart)
+
     # Returns a function definition for the current method
     # Or Creates a new one if not found
     def parseCSignature(self,method):
@@ -610,14 +617,19 @@ class kernelCacheClass(object):
                     df = fdefs[full_name]
                     return df
 
-                df = parseSignature(self.service,self.currentProgram,text,False)
+                if methAddr != None:
+                    df = parseSignature(self.service,self.currentProgram,text,False)
+                else:
+                    df = parseSignature(self.service,self.currentProgram,self.removeClassPrefix(text),False)
+
                 new = True
 
                 assert(df != None)
                 if self.macOS == True and methAddr == None:
                     name = method['name']
                     fdd = find_funcdef(name)
-                    assert(fdd != None)
+                    if fdd == None:
+                        return df
                     return fdd
 
                 func = getFunctionAt(methAddr)
@@ -643,8 +655,8 @@ class kernelCacheClass(object):
             except ghidra.app.util.cparser.C.ParseException as e:
                 # Ghidra is unable to parse this signature
                 # Put the original definition above, so the user will manually handle it
-                setPlateComment(methAddr,text)
-                df = self.setCustomFunctionDefinition(methName,methAddr,namespace,text)
+                setPlateComment(toAddr(hex(method['methodAddr'])),text)
+                df = self.setCustomFunctionDefinition(methName,toAddr(hex(method['methodAddr'])),namespace,text)
         else:
             if fdefs.has_key(full_name) == True:
                 df = fdefs[full_name]
