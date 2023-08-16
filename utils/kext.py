@@ -71,9 +71,9 @@ class Kext(kernelCache):
                     self.dtm.addDataType(s,None)
                     continue
                 self.dtm.replaceDataType(tmp,s,True)
-            self._end_trans(tid)
 
             self.process_all_classes()
+            self._end_trans(tid)
             self.resolve_kernel_objects()
         print ("[+] Done")
 
@@ -508,8 +508,11 @@ class Kext(kernelCache):
 
             assert(find_cm != None)
 
-            self.dtm.associateDataTypeWithArchive(find_cs,self.shm_dt.getLocalSourceArchive())
-            self.dtm.associateDataTypeWithArchive(find_cm,self.shm_dt.getLocalSourceArchive())
+            try:
+                self.dtm.associateDataTypeWithArchive(find_cs,self.shm_dt.getLocalSourceArchive())
+                self.dtm.associateDataTypeWithArchive(find_cm,self.shm_dt.getLocalSourceArchive())
+            except:
+                print("Could not get associate %s" %(className))
         self._end_trans(tid)
 
 
